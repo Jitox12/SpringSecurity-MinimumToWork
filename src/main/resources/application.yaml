@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/proof
+    username: postgres
+    password: 12345
+  jpa:
+    hibernate:
+      jdbc:
+        lob:
+          non_contextual_creation: true
+          ddl-auto: update
+
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+  logging.level.root: DEBUG
+server:
+  port: 8081
+
+
+security:
+  jwt:
+    expiration-in-minutes: 30
+    secret-key: "mV6a8+zzjl4v7ln6fhkd/KXxqA5lgLZL2MdtT4j68X8="
