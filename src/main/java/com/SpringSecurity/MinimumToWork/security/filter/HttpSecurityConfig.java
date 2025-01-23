@@ -45,15 +45,6 @@ public class HttpSecurityConfig {
     }
     private static void buildRequestMatchers(AuthorizeHttpRequestsConfigurer<HttpSecurity>.AuthorizationManagerRequestMatcherRegistry authReqConfig) {
 
-        /*
-         * Autorización de endpoints de usuario
-         * */
-
-
-        /*
-         * Autorización de endpoints públicos
-         * */
-
         authReqConfig.requestMatchers(HttpMethod.POST,"api/auth/authenticate").permitAll();
         authReqConfig.requestMatchers(HttpMethod.POST,"/api/auth/register").permitAll();
 

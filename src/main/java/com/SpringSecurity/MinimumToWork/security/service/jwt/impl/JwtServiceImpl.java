@@ -1,6 +1,7 @@
-package com.SpringSecurity.MinimumToWork.security.service.impl;
+package com.SpringSecurity.MinimumToWork.security.service.jwt.impl;
 
-import com.SpringSecurity.MinimumToWork.security.service.JwtService;
+import com.SpringSecurity.MinimumToWork.repository.model.UserEntity;
+import com.SpringSecurity.MinimumToWork.security.service.jwt.JwtService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -41,6 +43,16 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(generateKey(), Jwts.SIG.HS256)
 
                 .compact();
+    }
+
+    @Override
+    public Map<String, Object> generateExtraClaims(UserEntity user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("name",user.getName());
+        extraClaims.put("role",user.getRole().name());
+        extraClaims.put("authorities",user.getAuthorities());
+
+        return extraClaims;
     }
 
     public SecretKey generateKey(){

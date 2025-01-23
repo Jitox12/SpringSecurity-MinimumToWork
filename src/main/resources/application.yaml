@@ -16,7 +16,7 @@ spring:
     show-sql: true
   logging.level.root: DEBUG
 server:
-  port: 8081
+  port: 9090
 
 
 security:

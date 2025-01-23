@@ -1,11 +1,10 @@
-package com.SpringSecurity.MinimumToWork.security.service;
+package com.SpringSecurity.MinimumToWork.security.service.jwt;
 
+import com.SpringSecurity.MinimumToWork.repository.model.UserEntity;
 import io.jsonwebtoken.Claims;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
 import java.util.Map;
 
 public interface JwtService {
@@ -16,5 +15,7 @@ public interface JwtService {
 
    String extractEmail(String jwt);
 
-    public Claims extractAllClaims(String jwt);
+    Claims extractAllClaims(String jwt);
+
+    Map<String, Object> generateExtraClaims(UserEntity user);
 }

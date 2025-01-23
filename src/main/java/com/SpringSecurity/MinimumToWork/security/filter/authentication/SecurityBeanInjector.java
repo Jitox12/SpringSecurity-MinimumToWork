@@ -1,7 +1,6 @@
 package com.SpringSecurity.MinimumToWork.security.filter.authentication;
 
-import com.SpringSecurity.MinimumToWork.exceptionHandler.exception.ObjectNotFoundException;
-import com.SpringSecurity.MinimumToWork.repository.UserRepository;
+import com.SpringSecurity.MinimumToWork.security.service.user.GetUserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,10 +14,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Configuration
 public class SecurityBeanInjector {
 
-    private final UserRepository userRepository;
+    private final GetUserService getUserService;
 
-    public SecurityBeanInjector(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public SecurityBeanInjector(GetUserService getUserService) {
+        this.getUserService = getUserService;
     }
 
     @Bean
@@ -37,16 +36,11 @@ public class SecurityBeanInjector {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder();
+    public UserDetailsService userDetailsService(){
+        return getUserService::findOneByEmail;
     }
 
     @Bean
-    public UserDetailsService userDetailsService(){
-
-        return (email) -> userRepository.findByEmail(email)
-                .orElseThrow(()-> new ObjectNotFoundException("User not found with Username " +email));
-    }
-
+    public PasswordEncoder passwordEncoder(){return new BCryptPasswordEncoder();}
 
 }

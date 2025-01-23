@@ -1,9 +1,9 @@
-package com.SpringSecurity.MinimumToWork.security.dto;
+package com.SpringSecurity.MinimumToWork.security.dto.user;
 
 import java.io.Serializable;
 import java.util.UUID;
 
-public class RegisteredUser implements Serializable {
+public class RegisteredUserDto implements Serializable {
     private UUID id;
     private String username;
     private String name;

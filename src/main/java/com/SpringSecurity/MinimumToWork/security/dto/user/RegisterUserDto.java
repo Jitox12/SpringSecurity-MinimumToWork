@@ -1,8 +1,8 @@
-package com.SpringSecurity.MinimumToWork.security.dto;
+package com.SpringSecurity.MinimumToWork.security.dto.user;
 
 import java.io.Serializable;
 
-public class UserDto implements Serializable {
+public class RegisterUserDto implements Serializable {
 
     private String name;
     private String email;

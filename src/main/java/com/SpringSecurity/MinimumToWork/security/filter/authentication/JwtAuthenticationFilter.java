@@ -1,8 +1,7 @@
 package com.SpringSecurity.MinimumToWork.security.filter.authentication;
 
-import com.SpringSecurity.MinimumToWork.exceptionHandler.exception.ObjectNotFoundException;
-import com.SpringSecurity.MinimumToWork.security.service.JwtService;
-import com.SpringSecurity.MinimumToWork.security.service.UserService;
+import com.SpringSecurity.MinimumToWork.security.service.jwt.JwtService;
+import com.SpringSecurity.MinimumToWork.security.service.user.GetUserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,38 +19,52 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+    private final GetUserService getUserService;
     private final JwtService jwtService;
 
-    public JwtAuthenticationFilter(UserService userService, JwtService jwtService) {
-        this.userService = userService;
+    public JwtAuthenticationFilter(GetUserService getUserService, JwtService jwtService) {
+        this.getUserService = getUserService;
         this.jwtService = jwtService;
     }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //1.- Obtener encabezado http llamado Authorization
         String authorizationHeader = request.getHeader("Authorization");
-        if(!StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")){
+
+        if(getAuthorizationHeader(authorizationHeader)){
             filterChain.doFilter(request,response);
             return;
         }
-        //2.- Obtener token JWT desde el encabezado
-        String jwt = authorizationHeader.split(" ")[1];
 
-        //3.- Obtener el subject/email desde el token
-        //esta acción a su vez valida el formato del toke, firma y fecha de expiración
-        String email = jwtService.extractEmail(jwt);
-        //4.- Setear objecto authentication dentro de secutiry context holder
-        UserDetails userDetails = userService.findOneByEmail(email).orElseThrow(() -> new ObjectNotFoundException("User not found. Username: "+ email));
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                email,
-                null,
-                userDetails.getAuthorities()
-        );
-        authToken.setDetails(new WebAuthenticationDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        //5.- Ejecutar el resto de filtros
+        String email = extractEmail(authorizationHeader);
+        UserDetails userDetails = findUserDetails(email);
+        setAuthTokenInSecurityContextHolder(email, userDetails, request);
+
         filterChain.doFilter(request, response);
     }
+
+    private Boolean getAuthorizationHeader(String authorizationHeader){
+        return !StringUtils.hasText(authorizationHeader) || !authorizationHeader.startsWith("Bearer ");
+    }
+
+    private String extractEmail(String authorizationHeader){
+        String jwt = authorizationHeader.split(" ")[1];
+        return jwtService.extractEmail(jwt);
+    }
+
+    private UserDetails findUserDetails(String email){
+        return getUserService.findOneByEmail(email);
+    }
+
+    private void setAuthTokenInSecurityContextHolder(String email, UserDetails userDetails, HttpServletRequest request){
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                                                        email,
+                                                        null,
+                                                        userDetails.getAuthorities());
+
+        authToken.setDetails(new WebAuthenticationDetails(request));
+        SecurityContextHolder.getContext().setAuthentication(authToken);
+    }
+
+
 }
